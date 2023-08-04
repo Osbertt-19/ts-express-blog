@@ -2,8 +2,8 @@ import { redis } from '../config';
 import { createClient } from 'redis';
 import Logger from '../core/Logger';
 
-const redisURL = `redis://:${redis.password}@${redis.host}:${redis.port}`;
-
+const redisURL = `redis://${redis.host}:${redis.port}`;
+Logger.debug(redisURL);
 const client = createClient({ url: redisURL });
 
 client.on('connect', () => Logger.info('Cache is connecting'));
