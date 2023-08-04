@@ -14,8 +14,6 @@ export default interface Blog {
   author: User;
   imgUrl?: string;
   blogUrl: string;
-  likes?: number;
-  score: number;
   isSubmitted: boolean;
   isDraft: boolean;
   isPublished: boolean;
@@ -37,19 +35,14 @@ const schema = new Schema<Blog>(
     },
     description: {
       type: Schema.Types.String,
-      required: true,
       maxlength: 2000,
       trim: true,
     },
     text: {
       type: Schema.Types.String,
-      required: false,
-      select: false,
     },
     draftText: {
       type: Schema.Types.String,
-      required: true,
-      select: false,
     },
     tags: [
       {
@@ -66,8 +59,6 @@ const schema = new Schema<Blog>(
     },
     imgUrl: {
       type: Schema.Types.String,
-      required: false,
-      maxlength: 500,
       trim: true,
     },
     blogUrl: {
@@ -77,66 +68,49 @@ const schema = new Schema<Blog>(
       maxlength: 200,
       trim: true,
     },
-    likes: {
-      type: Schema.Types.Number,
-      default: 0,
-    },
-    score: {
-      type: Schema.Types.Number,
-      default: 0.01,
-      max: 1,
-      min: 0,
-    },
     isSubmitted: {
       type: Schema.Types.Boolean,
       default: false,
-      select: false,
       index: true,
     },
     isDraft: {
       type: Schema.Types.Boolean,
       default: true,
-      select: false,
       index: true,
     },
     isPublished: {
       type: Schema.Types.Boolean,
       default: false,
-      select: false,
       index: true,
     },
     publishedAt: {
       type: Schema.Types.Date,
-      required: false,
       index: true,
     },
     status: {
       type: Schema.Types.Boolean,
       default: true,
-      select: false,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      select: false,
       index: true,
     },
     updatedBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      select: false,
     },
     createdAt: {
       type: Date,
       required: true,
-      select: false,
+      default: new Date(),
     },
     updatedAt: {
       type: Date,
       required: true,
-      select: false,
+      default: new Date(),
     },
   },
   {

@@ -1,6 +1,4 @@
 import User, { UserModel } from '../model/User';
-import { RoleModel } from '../model/Role';
-import { InternalError } from '../../core/ApiError';
 import { Types } from 'mongoose';
 import KeystoreRepo from './KeystoreRepo';
 import Keystore from '../model/Keystore';
@@ -14,12 +12,7 @@ async function findPrivateProfileById(
   id: Types.ObjectId,
 ): Promise<User | null> {
   return UserModel.findOne({ _id: id, status: true })
-    .select('+email')
-    .populate({
-      path: 'roles',
-      match: { status: true },
-      select: { code: 1 },
-    })
+    .select('email')
     .lean<User>()
     .exec();
 }
@@ -27,11 +20,7 @@ async function findPrivateProfileById(
 // contains critical information of the user
 async function findById(id: Types.ObjectId): Promise<User | null> {
   return UserModel.findOne({ _id: id, status: true })
-    .select('+email +password +roles')
-    .populate({
-      path: 'roles',
-      match: { status: true },
-    })
+    .select('email +password roles')
     .lean()
     .exec();
 }
@@ -39,13 +28,8 @@ async function findById(id: Types.ObjectId): Promise<User | null> {
 async function findByEmail(email: string): Promise<User | null> {
   return UserModel.findOne({ email: email })
     .select(
-      '+email +password +roles +gender +dob +grade +country +state +city +school +bio +hobbies',
+      'email +password roles',
     )
-    .populate({
-      path: 'roles',
-      match: { status: true },
-      select: { code: 1 },
-    })
     .lean()
     .exec();
 }
@@ -67,18 +51,8 @@ async function create(
   user: User,
   accessTokenKey: string,
   refreshTokenKey: string,
-  roleCode: string,
 ): Promise<{ user: User; keystore: Keystore }> {
-  const now = new Date();
 
-  const role = await RoleModel.findOne({ code: roleCode })
-    .select('+code')
-    .lean()
-    .exec();
-  if (!role) throw new InternalError('Role must be defined');
-
-  user.roles = [role];
-  user.createdAt = user.updatedAt = now;
   const createdUser = await UserModel.create(user);
   const keystore = await KeystoreRepo.create(
     createdUser,
@@ -86,7 +60,7 @@ async function create(
     refreshTokenKey,
   );
   return {
-    user: { ...createdUser.toObject(), roles: user.roles },
+    user: createdUser.toObject(),
     keystore: keystore,
   };
 }
@@ -105,7 +79,7 @@ async function update(
     accessTokenKey,
     refreshTokenKey,
   );
-  return { user: user, keystore: keystore };
+  return { user, keystore };
 }
 
 async function updateInfo(user: User): Promise<any> {

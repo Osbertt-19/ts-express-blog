@@ -10,7 +10,6 @@ import validator from '../../helpers/validator';
 import schema from './schema';
 import asyncHandler from '../../helpers/asyncHandler';
 import bcrypt from 'bcrypt';
-import { RoleCode } from '../../database/model/Role';
 import { getUserData } from './utils';
 
 const router = express.Router();
@@ -32,10 +31,10 @@ router.post(
         email: req.body.email,
         profilePicUrl: req.body.profilePicUrl,
         password: passwordHash,
+        roles: req.body.roles,
       } as User,
       accessTokenKey,
       refreshTokenKey,
-      RoleCode.LEARNER,
     );
 
     const tokens = await createTokens(

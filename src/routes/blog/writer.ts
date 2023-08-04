@@ -4,7 +4,6 @@ import { ProtectedRequest } from '../../types/app-request';
 import { BadRequestError, ForbiddenError } from '../../core/ApiError';
 import BlogRepo from '../../database/repository/BlogRepo';
 import Blog from '../../database/model/Blog';
-import { RoleCode } from '../../database/model/Role';
 import { Types } from 'mongoose';
 import validator, { ValidationSource } from '../../helpers/validator';
 import schema from './schema';
@@ -12,11 +11,12 @@ import asyncHandler from '../../helpers/asyncHandler';
 import authentication from '../../auth/authentication';
 import authorization from '../../auth/authorization';
 import role from '../../helpers/role';
+import { Role } from '../../database/model/User';
 
 const router = express.Router();
 
 /*-------------------------------------------------------------------------*/
-router.use(authentication, role(RoleCode.WRITER), authorization);
+router.use(authentication, role(Role.WRITER), authorization);
 /*-------------------------------------------------------------------------*/
 
 const formatEndpoint = (endpoint: string) =>
@@ -39,7 +39,6 @@ router.post(
       author: req.user,
       blogUrl: req.body.blogUrl,
       imgUrl: req.body.imgUrl,
-      score: req.body.score,
       createdBy: req.user,
       updatedBy: req.user,
     } as Blog);
@@ -56,7 +55,7 @@ router.put(
     const blog = await BlogRepo.findBlogAllDataById(
       new Types.ObjectId(req.params.id),
     );
-    if (blog == null) throw new BadRequestError('Blog does not exists');
+    if (!blog) throw new BadRequestError('Blog does not exists');
     if (!blog.author._id.equals(req.user._id))
       throw new ForbiddenError("You don't have necessary permissions");
 
@@ -72,7 +71,6 @@ router.put(
     if (req.body.text) blog.draftText = req.body.text;
     if (req.body.tags) blog.tags = req.body.tags;
     if (req.body.imgUrl) blog.imgUrl = req.body.imgUrl;
-    if (req.body.score) blog.score = req.body.score;
 
     await BlogRepo.update(blog);
     new SuccessResponse('Blog updated successfully', blog).send(res);

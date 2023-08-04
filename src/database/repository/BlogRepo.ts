@@ -5,9 +5,6 @@ import User from '../model/User';
 const AUTHOR_DETAIL = 'name profilePicUrl';
 
 async function create(blog: Blog): Promise<Blog> {
-  const now = new Date();
-  blog.createdAt = now;
-  blog.updatedAt = now;
   const createdBlog = await BlogModel.create(blog);
   return createdBlog.toObject();
 }
@@ -30,7 +27,7 @@ async function findInfoForPublishedById(
   id: Types.ObjectId,
 ): Promise<Blog | null> {
   return BlogModel.findOne({ _id: id, isPublished: true, status: true })
-    .select('+text')
+    .select('text')
     .populate('author', AUTHOR_DETAIL)
     .lean()
     .exec();
@@ -39,7 +36,7 @@ async function findInfoForPublishedById(
 async function findBlogAllDataById(id: Types.ObjectId): Promise<Blog | null> {
   return BlogModel.findOne({ _id: id, status: true })
     .select(
-      '+text +draftText +isSubmitted +isDraft +isPublished +status +createdBy +updatedBy',
+      'text draftText isSubmitted isDraft isPublished status createdBy updatedBy',
     )
     .populate('author', AUTHOR_DETAIL)
     .lean()
@@ -112,7 +109,7 @@ async function findDetailedBlogs(
   query: Record<string, unknown>,
 ): Promise<Blog[]> {
   return BlogModel.find(query)
-    .select('+isSubmitted +isDraft +isPublished +createdBy +updatedBy')
+    .select('isSubmitted isDraft isPublished createdBy updatedBy')
     .populate('author', AUTHOR_DETAIL)
     .populate('createdBy', AUTHOR_DETAIL)
     .populate('updatedBy', AUTHOR_DETAIL)
@@ -165,9 +162,7 @@ async function search(query: string, limit: number): Promise<Blog[]> {
       similarity: { $meta: 'textScore' },
     },
   )
-    .select('-status -description')
     .limit(limit)
-    .sort({ similarity: { $meta: 'textScore' } })
     .lean()
     .exec();
 }
@@ -178,7 +173,6 @@ async function searchLike(query: string, limit: number): Promise<Blog[]> {
     status: true,
     isPublished: true,
   })
-    .select('-status -description')
     .limit(limit)
     .sort({ score: -1 })
     .lean()

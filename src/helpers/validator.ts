@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import Logger from '../core/Logger';
 import { BadRequestError } from '../core/ApiError';
 import { Types } from 'mongoose';
+import { Role } from '../database/model/User';
 
 export enum ValidationSource {
   BODY = 'body',
@@ -29,6 +30,12 @@ export const JoiAuthBearer = () =>
     if (!value.split(' ')[1]) return helpers.error('any.invalid');
     return value;
   }, 'Authorization Header Validation');
+
+  export const JoiRole = () =>
+  Joi.string().custom((value: string, helpers) => {
+    if (!Object.keys(Role).includes(value)) return helpers.error('any.invalid');
+    return value;
+  }, 'Role Validation');
 
 export default (
     schema: Joi.AnySchema,

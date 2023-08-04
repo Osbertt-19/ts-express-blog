@@ -1,8 +1,14 @@
 import { model, Schema, Types } from 'mongoose';
-import Role from './Role';
 
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
+
+export enum Role {
+  LEARNER = 'LEARNER',
+  WRITER = 'WRITER',
+  EDITOR = 'EDITOR',
+  ADMIN = 'ADMIN',
+}
 
 export default interface User {
   _id: Types.ObjectId;
@@ -10,7 +16,7 @@ export default interface User {
   profilePicUrl?: string;
   email?: string;
   password?: string;
-  roles: Role[];
+  roles: string[];
   verified?: boolean;
   status?: boolean;
   createdAt?: Date;
@@ -31,7 +37,6 @@ const schema = new Schema<User>(
     email: {
       type: Schema.Types.String,
       unique: true,
-      sparse: true, // allows null
       trim: true,
       select: false,
     },
@@ -42,12 +47,11 @@ const schema = new Schema<User>(
     roles: {
       type: [
         {
-          type: Schema.Types.ObjectId,
-          ref: 'Role',
+          type: Schema.Types.String,
+          enum: Object.values(Role)
         },
       ],
       required: true,
-      select: false,
     },
     verified: {
       type: Schema.Types.Boolean,
@@ -60,12 +64,12 @@ const schema = new Schema<User>(
     createdAt: {
       type: Schema.Types.Date,
       required: true,
-      select: false,
+      default: new Date(),
     },
     updatedAt: {
       type: Schema.Types.Date,
       required: true,
-      select: false,
+      default: new Date(),
     },
   },
   {

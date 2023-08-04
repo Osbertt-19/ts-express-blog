@@ -14,7 +14,6 @@ export default {
     text: Joi.string().required().max(50000),
     blogUrl: JoiUrlEndpoint().required().max(200),
     imgUrl: Joi.string().optional().uri().max(200),
-    score: Joi.number().optional().min(0).max(1),
     tags: Joi.array().optional().min(1).items(Joi.string().uppercase()),
   }),
   blogUpdate: Joi.object().keys({

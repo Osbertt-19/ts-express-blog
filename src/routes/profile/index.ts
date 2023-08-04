@@ -21,10 +21,8 @@ router.get(
     const user = await UserRepo.findPrivateProfileById(req.user._id);
     if (!user) throw new BadRequestError('User not registered');
 
-    return new SuccessResponse(
-      'success',
-      _.pick(user, ['name', 'email', 'profilePicUrl', 'roles']),
-    ).send(res);
+    const data = _.pick(user, ['name', 'email', 'profilePicUrl', 'roles']);
+    return new SuccessResponse('success', data).send(res);
   }),
 );
 
