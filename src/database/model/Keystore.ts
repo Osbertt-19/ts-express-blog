@@ -51,9 +51,9 @@ const schema = new Schema<Keystore>(
   },
 );
 
-// schema.index({ client: 1 });
-// schema.index({ client: 1, primaryKey: 1, status: 1 });
-// schema.index({ client: 1, primaryKey: 1, secondaryKey: 1 });
+schema.index({ client: 1 });
+schema.index({ client: 1, primaryKey: 1, status: 1 });
+schema.index({ client: 1, primaryKey: 1, secondaryKey: 1 });
 
 export const KeystoreModel = model<Keystore>(
   DOCUMENT_NAME,

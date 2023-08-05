@@ -48,7 +48,7 @@ const schema = new Schema<User>(
       type: [
         {
           type: Schema.Types.String,
-          enum: Object.values(Role)
+          enum: Object.values(Role),
         },
       ],
       required: true,
@@ -77,8 +77,8 @@ const schema = new Schema<User>(
   },
 );
 
-// schema.index({ _id: 1, status: 1 });
-// schema.index({ email: 1 });
-// schema.index({ status: 1 });
+schema.index({ _id: 1, status: 1 });
+schema.index({ email: 1 });
+schema.index({ status: 1 });
 
 export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME);
